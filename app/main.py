@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 
 from app.auth import verify_api_key
-from app.routers import courses, modules, lessons, sections
+from app.routers import courses, modules, lessons, sections, quizzes
 
 app = FastAPI(
     title="Avatar4University API",
@@ -14,6 +14,7 @@ app.include_router(courses.router, prefix="/api/v1")
 app.include_router(modules.router, prefix="/api/v1")
 app.include_router(lessons.router, prefix="/api/v1")
 app.include_router(sections.router, prefix="/api/v1")
+app.include_router(quizzes.router, prefix="/api/v1")
 
 
 @app.get("/health", include_in_schema=False)

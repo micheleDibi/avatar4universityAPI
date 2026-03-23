@@ -67,6 +67,8 @@ class Lesson(Base):
 
     module = relationship("Module", back_populates="lessons")
     sections = relationship("Section", back_populates="lesson", lazy="select")
+    open_questions = relationship("OpenQuestion", back_populates="lesson", lazy="select")
+    quizzes = relationship("Quiz", back_populates="lesson", lazy="select")
 
 
 class Section(Base):
@@ -103,3 +105,48 @@ class Slide(Base):
     contents_json = Column(String, nullable=False)
 
     section = relationship("Section", back_populates="slide")
+
+
+class OpenQuestion(Base):
+    __tablename__ = "open_questions"
+
+    id = Column(Integer, primary_key=True)
+    question_text = Column(String, nullable=False)
+    lesson_id = Column(Integer, ForeignKey("lessons.id"))
+
+    lesson = relationship("Lesson", back_populates="open_questions")
+
+
+class Quiz(Base):
+    __tablename__ = "quizzes"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    lesson_id = Column(Integer, ForeignKey("lessons.id"))
+
+    lesson = relationship("Lesson", back_populates="quizzes")
+    questions = relationship("QuizQuestion", back_populates="quiz", lazy="select")
+
+
+class QuizQuestion(Base):
+    __tablename__ = "quiz_questions"
+
+    id = Column(Integer, primary_key=True)
+    question_text = Column(String, nullable=False)
+    difficulty = Column(String, nullable=False)
+    origin_lesson = Column(Integer)
+    quiz_id = Column(Integer, ForeignKey("quizzes.id"))
+
+    quiz = relationship("Quiz", back_populates="questions")
+    options = relationship("QuizOption", back_populates="question", lazy="select")
+
+
+class QuizOption(Base):
+    __tablename__ = "quiz_options"
+
+    id = Column(Integer, primary_key=True)
+    option_text = Column(String, nullable=False)
+    is_correct = Column(Boolean, nullable=False)
+    quiz_question_id = Column(Integer, ForeignKey("quiz_questions.id"))
+
+    question = relationship("QuizQuestion", back_populates="options")

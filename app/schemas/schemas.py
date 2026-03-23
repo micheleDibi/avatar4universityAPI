@@ -48,6 +48,65 @@ class SectionDetail(SectionBase):
     slide: Optional[SlideSchema] = None
 
 
+# --- Open Question ---
+
+class OpenQuestionSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    question_text: str
+    lesson_id: Optional[int] = None
+
+
+# --- Quiz Option ---
+
+class QuizOptionSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    option_text: str
+    is_correct: bool
+    quiz_question_id: Optional[int] = None
+
+
+# --- Quiz Question ---
+
+class QuizQuestionBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    question_text: str
+    difficulty: str
+    origin_lesson: Optional[int] = None
+    quiz_id: Optional[int] = None
+
+
+class QuizQuestionList(QuizQuestionBase):
+    pass
+
+
+class QuizQuestionDetail(QuizQuestionBase):
+    options: list[QuizOptionSchema] = []
+
+
+# --- Quiz ---
+
+class QuizBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    lesson_id: Optional[int] = None
+
+
+class QuizList(QuizBase):
+    pass
+
+
+class QuizDetail(QuizBase):
+    questions: list[QuizQuestionList] = []
+
+
 # --- Lesson ---
 
 class LessonBase(BaseModel):
@@ -74,6 +133,8 @@ class LessonList(LessonBase):
 
 class LessonDetail(LessonBase):
     sections: list[SectionList] = []
+    open_questions: list[OpenQuestionSchema] = []
+    quizzes: list[QuizList] = []
 
 
 # --- Module ---

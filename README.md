@@ -16,6 +16,8 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
   - [Moduli](#moduli)
   - [Lezioni](#lezioni)
   - [Sezioni](#sezioni)
+  - [Domande Aperte](#domande-aperte)
+  - [Quiz](#quiz)
 - [Errori](#errori)
 - [Struttura del Progetto](#struttura-del-progetto)
 
@@ -35,8 +37,12 @@ Questa API espone in sola lettura un database SQLite (~500MB) contenente corsi u
 Course (119 record)
   └── Module (495 record)
         └── Lesson (3.457 record)
-              └── Section (17.604 record)
-                    └── Slide (10.040 record, relazione 1:1 con Section)
+              ├── Section (17.604 record)
+              │     └── Slide (10.040 record, relazione 1:1 con Section)
+              ├── OpenQuestion (1.414 record)
+              └── Quiz (241 record)
+                    └── QuizQuestion (7.094 record)
+                          └── QuizOption (28.376 record)
 ```
 
 ---
@@ -460,7 +466,7 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 #### `GET /api/v1/lessons/{id}`
 
-Restituisce il dettaglio di una lezione, inclusa la lista delle sue sezioni.
+Restituisce il dettaglio di una lezione, inclusa la lista delle sue sezioni, domande aperte e quiz.
 
 **Richiesta:**
 ```bash
@@ -670,6 +676,194 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 ---
 
+### Domande Aperte
+
+#### `GET /api/v1/lessons/{id}/open-questions`
+
+Restituisce la lista paginata delle domande aperte associate a una lezione.
+
+**Richiesta:**
+```bash
+curl -H "X-API-Key: la-tua-chiave" \
+  "http://localhost:8000/api/v1/lessons/249/open-questions?limit=2"
+```
+
+**Risposta** — `200 OK`:
+```json
+[
+  {
+    "id": 1,
+    "question_text": "Analyze how the choice of tokenization granularity influences attention patterns...",
+    "lesson_id": 249
+  },
+  {
+    "id": 2,
+    "question_text": "Design a small comparative study to evaluate BPE versus SentencePiece...",
+    "lesson_id": 249
+  }
+]
+```
+
+| Campo | Tipo | Descrizione |
+|-------|------|-------------|
+| `id` | int | Identificativo univoco della domanda |
+| `question_text` | string | Testo della domanda aperta |
+| `lesson_id` | int \| null | ID della lezione di appartenenza |
+
+---
+
+### Quiz
+
+#### `GET /api/v1/lessons/{id}/quizzes`
+
+Restituisce la lista paginata dei quiz associati a una lezione.
+
+**Richiesta:**
+```bash
+curl -H "X-API-Key: la-tua-chiave" \
+  "http://localhost:8000/api/v1/lessons/249/quizzes"
+```
+
+**Risposta** — `200 OK`:
+```json
+[
+  {
+    "id": 1,
+    "title": "Assessment Quiz - Foundations of Tokenization and GPT",
+    "lesson_id": 249
+  }
+]
+```
+
+| Campo | Tipo | Descrizione |
+|-------|------|-------------|
+| `id` | int | Identificativo univoco del quiz |
+| `title` | string | Titolo del quiz |
+| `lesson_id` | int \| null | ID della lezione di appartenenza |
+
+---
+
+#### `GET /api/v1/quizzes/{id}`
+
+Restituisce il dettaglio di un quiz, inclusa la lista delle sue domande.
+
+**Richiesta:**
+```bash
+curl -H "X-API-Key: la-tua-chiave" \
+  http://localhost:8000/api/v1/quizzes/1
+```
+
+**Risposta** — `200 OK`:
+```json
+{
+  "id": 1,
+  "title": "Assessment Quiz - Foundations of Tokenization and GPT",
+  "lesson_id": 249,
+  "questions": [
+    {
+      "id": 1,
+      "question_text": "Which statement best describes character-level tokenization compared to subword-level tokenization?",
+      "difficulty": "EASY",
+      "origin_lesson": 1,
+      "quiz_id": 1
+    }
+  ]
+}
+```
+
+**Quiz non trovato** — `404 Not Found`:
+```json
+{
+  "detail": "Quiz not found"
+}
+```
+
+---
+
+#### `GET /api/v1/quizzes/{id}/questions`
+
+Restituisce la lista paginata delle domande di un quiz.
+
+**Richiesta:**
+```bash
+curl -H "X-API-Key: la-tua-chiave" \
+  "http://localhost:8000/api/v1/quizzes/1/questions?limit=2"
+```
+
+**Risposta** — `200 OK`:
+```json
+[
+  {
+    "id": 1,
+    "question_text": "Which statement best describes character-level tokenization compared to subword-level tokenization?",
+    "difficulty": "EASY",
+    "origin_lesson": 1,
+    "quiz_id": 1
+  }
+]
+```
+
+| Campo | Tipo | Descrizione |
+|-------|------|-------------|
+| `id` | int | Identificativo univoco della domanda |
+| `question_text` | string | Testo della domanda |
+| `difficulty` | string | Difficoltà (`EASY`, `MEDIUM`, `HARD`) |
+| `origin_lesson` | int \| null | ID della lezione di origine della domanda |
+| `quiz_id` | int \| null | ID del quiz di appartenenza |
+
+---
+
+#### `GET /api/v1/questions/{id}`
+
+Restituisce il dettaglio di una domanda di quiz, incluse le opzioni di risposta.
+
+**Richiesta:**
+```bash
+curl -H "X-API-Key: la-tua-chiave" \
+  http://localhost:8000/api/v1/questions/1
+```
+
+**Risposta** — `200 OK`:
+```json
+{
+  "id": 1,
+  "question_text": "Which statement best describes character-level tokenization compared to subword-level tokenization?",
+  "difficulty": "EASY",
+  "origin_lesson": 1,
+  "quiz_id": 1,
+  "options": [
+    {
+      "id": 1,
+      "option_text": "Character-level tokenization yields shorter sequences but loses ability to spell new words.",
+      "is_correct": false,
+      "quiz_question_id": 1
+    },
+    {
+      "id": 2,
+      "option_text": "Character-level tokenization yields longer sequences but can spell any word, including unseen ones.",
+      "is_correct": true,
+      "quiz_question_id": 1
+    }
+  ]
+}
+```
+
+**Domanda non trovata** — `404 Not Found`:
+```json
+{
+  "detail": "Question not found"
+}
+```
+
+| Campo Opzione | Tipo | Descrizione |
+|---------------|------|-------------|
+| `id` | int | Identificativo univoco dell'opzione |
+| `option_text` | string | Testo dell'opzione di risposta |
+| `is_correct` | bool | Se l'opzione è la risposta corretta |
+| `quiz_question_id` | int \| null | ID della domanda di appartenenza |
+
+---
+
 ## Errori
 
 L'API utilizza codici di stato HTTP standard:
@@ -702,7 +896,7 @@ avatar4universityAPI/
 │   ├── auth.py              # Dependency di autenticazione tramite API key
 │   ├── models/
 │   │   ├── __init__.py
-│   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide)
+│   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide, OpenQuestion, Quiz, QuizQuestion, QuizOption)
 │   ├── schemas/
 │   │   ├── __init__.py
 │   │   └── schemas.py       # Schemi Pydantic per le risposte
@@ -710,8 +904,9 @@ avatar4universityAPI/
 │       ├── __init__.py
 │       ├── courses.py        # Endpoint corsi
 │       ├── modules.py        # Endpoint moduli
-│       ├── lessons.py        # Endpoint lezioni
-│       └── sections.py       # Endpoint sezioni
+│       ├── lessons.py        # Endpoint lezioni e domande aperte
+│       ├── sections.py       # Endpoint sezioni
+│       └── quizzes.py        # Endpoint quiz e domande quiz
 ├── database.db               # Database SQLite (non incluso nel repository)
 ├── .env.example              # Template variabili d'ambiente
 ├── .gitignore
