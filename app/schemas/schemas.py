@@ -16,6 +16,8 @@ class SlideSchema(BaseModel):
     title: str
     type: str
     contents_json: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 # --- Section ---
@@ -38,6 +40,8 @@ class SectionBase(BaseModel):
     slide_audio_video_url: Optional[str] = None
     section_pdf_url: Optional[str] = None
     lesson_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class SectionList(SectionBase):
@@ -56,6 +60,8 @@ class OpenQuestionSchema(BaseModel):
     id: int
     question_text: str
     lesson_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 # --- Quiz Option ---
@@ -67,6 +73,8 @@ class QuizOptionSchema(BaseModel):
     option_text: str
     is_correct: bool
     quiz_question_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 # --- Quiz Question ---
@@ -79,6 +87,8 @@ class QuizQuestionBase(BaseModel):
     difficulty: str
     origin_lesson: Optional[int] = None
     quiz_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class QuizQuestionList(QuizQuestionBase):
@@ -97,6 +107,8 @@ class QuizBase(BaseModel):
     id: int
     title: str
     lesson_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class QuizList(QuizBase):
@@ -125,6 +137,8 @@ class LessonBase(BaseModel):
     slides_and_audio_video_url: Optional[str] = None
     lesson_type: Optional[str] = None
     module_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class LessonList(LessonBase):
@@ -147,6 +161,8 @@ class ModuleBase(BaseModel):
     duration_minutes: Optional[int] = None
     order: Optional[int] = None
     course_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class ModuleList(ModuleBase):

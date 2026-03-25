@@ -42,6 +42,8 @@ class Module(Base):
     order = Column("order", Integer)
     lessons_structure_json = Column(String)
     course_id = Column(Integer, ForeignKey("courses.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     course = relationship("Course", back_populates="modules")
     lessons = relationship("Lesson", back_populates="module", lazy="select")
@@ -64,6 +66,8 @@ class Lesson(Base):
     slides_and_audio_video_url = Column(String)
     lesson_type = Column(String, default="CONTENT")
     module_id = Column(Integer, ForeignKey("modules.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     module = relationship("Module", back_populates="lessons")
     sections = relationship("Section", back_populates="lesson", lazy="select")
@@ -90,6 +94,8 @@ class Section(Base):
     slide_audio_video_url = Column(String)
     section_pdf_url = Column(String)
     lesson_id = Column(Integer, ForeignKey("lessons.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     lesson = relationship("Lesson", back_populates="sections")
     slide = relationship("Slide", back_populates="section", uselist=False, lazy="select")
@@ -103,6 +109,8 @@ class Slide(Base):
     title = Column(String, nullable=False)
     type = Column(String, nullable=False)
     contents_json = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     section = relationship("Section", back_populates="slide")
 
@@ -113,6 +121,8 @@ class OpenQuestion(Base):
     id = Column(Integer, primary_key=True)
     question_text = Column(String, nullable=False)
     lesson_id = Column(Integer, ForeignKey("lessons.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     lesson = relationship("Lesson", back_populates="open_questions")
 
@@ -123,6 +133,8 @@ class Quiz(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
     lesson_id = Column(Integer, ForeignKey("lessons.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     lesson = relationship("Lesson", back_populates="quizzes")
     questions = relationship("QuizQuestion", back_populates="quiz", lazy="select")
@@ -136,6 +148,8 @@ class QuizQuestion(Base):
     difficulty = Column(String, nullable=False)
     origin_lesson = Column(Integer)
     quiz_id = Column(Integer, ForeignKey("quizzes.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     quiz = relationship("Quiz", back_populates="questions")
     options = relationship("QuizOption", back_populates="question", lazy="select")
@@ -148,5 +162,7 @@ class QuizOption(Base):
     option_text = Column(String, nullable=False)
     is_correct = Column(Boolean, nullable=False)
     quiz_question_id = Column(Integer, ForeignKey("quiz_questions.id"))
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     question = relationship("QuizQuestion", back_populates="options")

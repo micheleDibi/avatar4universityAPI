@@ -361,6 +361,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `duration_minutes` | int \| null | Durata in minuti |
 | `order` | int \| null | Ordine di visualizzazione |
 | `course_id` | int \| null | ID del corso di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -384,6 +386,8 @@ curl -H "X-API-Key: la-tua-chiave" \
   "duration_minutes": 20,
   "order": 0,
   "course_id": 2,
+  "created_at": "2026-03-23T00:00:00",
+  "updated_at": "2026-03-23T00:00:00",
   "lessons": [
     {
       "id": 7,
@@ -398,7 +402,9 @@ curl -H "X-API-Key: la-tua-chiave" \
       "slides_and_avatar_video_url": null,
       "slides_and_audio_video_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/.../slides_audio.mp4",
       "lesson_type": "CONTENT",
-      "module_id": 6
+      "module_id": 6,
+      "created_at": "2026-03-23T00:00:00",
+      "updated_at": "2026-03-23T00:00:00"
     }
   ]
 }
@@ -439,7 +445,9 @@ curl -H "X-API-Key: la-tua-chiave" \
     "slides_and_avatar_video_url": null,
     "slides_and_audio_video_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/.../slides_audio.mp4",
     "lesson_type": "CONTENT",
-    "module_id": 6
+    "module_id": 6,
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   }
 ]
 ```
@@ -459,6 +467,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `slides_and_audio_video_url` | string \| null | URL del video slide + audio |
 | `lesson_type` | string \| null | Tipologia della lezione (es. `CONTENT`) |
 | `module_id` | int \| null | ID del modulo di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -490,6 +500,8 @@ curl -H "X-API-Key: la-tua-chiave" \
   "slides_and_audio_video_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/.../slides_audio.mp4",
   "lesson_type": "CONTENT",
   "module_id": 6,
+  "created_at": "2026-03-23T00:00:00",
+  "updated_at": "2026-03-23T00:00:00",
   "sections": [
     {
       "id": 5,
@@ -506,7 +518,9 @@ curl -H "X-API-Key: la-tua-chiave" \
       "slides_and_avatar_video_url": null,
       "slide_audio_video_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/.../slides_audio.mp4",
       "section_pdf_url": null,
-      "lesson_id": 7
+      "lesson_id": 7,
+      "created_at": "2026-03-23T00:00:00",
+      "updated_at": "2026-03-23T00:00:00"
     },
     {
       "id": 6,
@@ -523,7 +537,9 @@ curl -H "X-API-Key: la-tua-chiave" \
       "slides_and_avatar_video_url": null,
       "slide_audio_video_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/.../slides_audio.mp4",
       "section_pdf_url": null,
-      "lesson_id": 7
+      "lesson_id": 7,
+      "created_at": "2026-03-23T00:00:00",
+      "updated_at": "2026-03-23T00:00:00"
     }
   ]
 }
@@ -583,7 +599,9 @@ curl -H "X-API-Key: la-tua-chiave" \
     "slides_and_avatar_video_url": null,
     "slide_audio_video_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/.../slides_audio.mp4",
     "section_pdf_url": null,
-    "lesson_id": 7
+    "lesson_id": 7,
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   }
 ]
 ```
@@ -605,6 +623,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `slide_audio_video_url` | string \| null | URL del video slide + audio |
 | `section_pdf_url` | string \| null | URL del PDF della sezione |
 | `lesson_id` | int \| null | ID della lezione di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -638,12 +658,16 @@ curl -H "X-API-Key: la-tua-chiave" \
   "slide_audio_video_url": null,
   "section_pdf_url": null,
   "lesson_id": 8,
+  "created_at": "2026-03-23T00:00:00",
+  "updated_at": "2026-03-23T00:00:00",
   "slide": {
     "id": 8,
     "section_id": 1,
     "title": "Foundations of Linear Models",
     "type": "TEXT",
-    "contents_json": "[\"Linear regression predicts a numerical outcome by assuming the response moves in a straight line...\", \"As you prepare data, scaling inputs helps penalties behave predictably...\"]"
+    "contents_json": "[\"Linear regression predicts a numerical outcome by assuming the response moves in a straight line...\", \"As you prepare data, scaling inputs helps penalties behave predictably...\"]",
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   }
 }
 ```
@@ -673,6 +697,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `title` | string | Titolo della slide |
 | `type` | string | Tipo di slide (es. `TEXT`) |
 | `contents_json` | string \| null | Contenuto della slide (JSON serializzato) |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -694,12 +720,16 @@ curl -H "X-API-Key: la-tua-chiave" \
   {
     "id": 1,
     "question_text": "Analyze how the choice of tokenization granularity influences attention patterns...",
-    "lesson_id": 249
+    "lesson_id": 249,
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   },
   {
     "id": 2,
     "question_text": "Design a small comparative study to evaluate BPE versus SentencePiece...",
-    "lesson_id": 249
+    "lesson_id": 249,
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   }
 ]
 ```
@@ -709,6 +739,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `id` | int | Identificativo univoco della domanda |
 | `question_text` | string | Testo della domanda aperta |
 | `lesson_id` | int \| null | ID della lezione di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -730,7 +762,9 @@ curl -H "X-API-Key: la-tua-chiave" \
   {
     "id": 1,
     "title": "Assessment Quiz - Foundations of Tokenization and GPT",
-    "lesson_id": 249
+    "lesson_id": 249,
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   }
 ]
 ```
@@ -740,6 +774,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `id` | int | Identificativo univoco del quiz |
 | `title` | string | Titolo del quiz |
 | `lesson_id` | int \| null | ID della lezione di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -759,13 +795,17 @@ curl -H "X-API-Key: la-tua-chiave" \
   "id": 1,
   "title": "Assessment Quiz - Foundations of Tokenization and GPT",
   "lesson_id": 249,
+  "created_at": "2026-03-23T00:00:00",
+  "updated_at": "2026-03-23T00:00:00",
   "questions": [
     {
       "id": 1,
       "question_text": "Which statement best describes character-level tokenization compared to subword-level tokenization?",
       "difficulty": "EASY",
       "origin_lesson": 1,
-      "quiz_id": 1
+      "quiz_id": 1,
+      "created_at": "2026-03-23T00:00:00",
+      "updated_at": "2026-03-23T00:00:00"
     }
   ]
 }
@@ -798,7 +838,9 @@ curl -H "X-API-Key: la-tua-chiave" \
     "question_text": "Which statement best describes character-level tokenization compared to subword-level tokenization?",
     "difficulty": "EASY",
     "origin_lesson": 1,
-    "quiz_id": 1
+    "quiz_id": 1,
+    "created_at": "2026-03-23T00:00:00",
+    "updated_at": "2026-03-23T00:00:00"
   }
 ]
 ```
@@ -810,6 +852,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `difficulty` | string | Difficoltà (`EASY`, `MEDIUM`, `HARD`) |
 | `origin_lesson` | int \| null | ID della lezione di origine della domanda |
 | `quiz_id` | int \| null | ID del quiz di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -831,18 +875,24 @@ curl -H "X-API-Key: la-tua-chiave" \
   "difficulty": "EASY",
   "origin_lesson": 1,
   "quiz_id": 1,
+  "created_at": "2026-03-23T00:00:00",
+  "updated_at": "2026-03-23T00:00:00",
   "options": [
     {
       "id": 1,
       "option_text": "Character-level tokenization yields shorter sequences but loses ability to spell new words.",
       "is_correct": false,
-      "quiz_question_id": 1
+      "quiz_question_id": 1,
+      "created_at": "2026-03-23T00:00:00",
+      "updated_at": "2026-03-23T00:00:00"
     },
     {
       "id": 2,
       "option_text": "Character-level tokenization yields longer sequences but can spell any word, including unseen ones.",
       "is_correct": true,
-      "quiz_question_id": 1
+      "quiz_question_id": 1,
+      "created_at": "2026-03-23T00:00:00",
+      "updated_at": "2026-03-23T00:00:00"
     }
   ]
 }
@@ -861,6 +911,8 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `option_text` | string | Testo dell'opzione di risposta |
 | `is_correct` | bool | Se l'opzione è la risposta corretta |
 | `quiz_question_id` | int \| null | ID della domanda di appartenenza |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
 
 ---
 
@@ -908,6 +960,7 @@ avatar4universityAPI/
 │       ├── sections.py       # Endpoint sezioni
 │       └── quizzes.py        # Endpoint quiz e domande quiz
 ├── database.db               # Database SQLite (non incluso nel repository)
+├── add_timestamps.sql        # Migrazione SQL per aggiungere created_at/updated_at con trigger automatici
 ├── .env.example              # Template variabili d'ambiente
 ├── .gitignore
 ├── requirements.txt
