@@ -25,9 +25,9 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
 
 ## Panoramica
 
-Questa API espone in sola lettura un database SQLite (~500MB) contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso è protetto tramite API key.
+Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso è protetto tramite API key.
 
-**Stack tecnologico:** FastAPI, SQLAlchemy, SQLite, Pydantic
+**Stack tecnologico:** FastAPI, SQLAlchemy, PostgreSQL/SQLite, Pydantic
 
 ---
 
@@ -959,8 +959,8 @@ avatar4universityAPI/
 │       ├── lessons.py        # Endpoint lezioni e domande aperte
 │       ├── sections.py       # Endpoint sezioni
 │       └── quizzes.py        # Endpoint quiz e domande quiz
-├── database.db               # Database SQLite (non incluso nel repository)
-├── add_timestamps.sql        # Migrazione SQL per aggiungere created_at/updated_at con trigger automatici
+├── add_timestamps.sql        # Migrazione timestamp per SQLite
+├── add_timestamps_postgres.sql # Migrazione timestamp per PostgreSQL
 ├── .env.example              # Template variabili d'ambiente
 ├── .gitignore
 ├── requirements.txt
