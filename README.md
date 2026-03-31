@@ -19,6 +19,7 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
   - [Domande Aperte](#domande-aperte)
   - [Quiz](#quiz)
   - [Utenti](#utenti)
+  - [Autenticazione Utente (Login)](#autenticazione-utente-login)
 - [Errori](#errori)
 - [Struttura del Progetto](#struttura-del-progetto)
 
@@ -84,7 +85,7 @@ La documentazione interattiva Swagger è accessibile su `http://localhost:8000/d
 
 ## Autenticazione
 
-Tutti gli endpoint richiedono l'header `X-API-Key` con il valore configurato nel file `.env`.
+Tutti gli endpoint (tranne il login) richiedono l'header `X-API-Key` con il valore configurato nel file `.env`.
 
 ```bash
 curl -H "X-API-Key: la-tua-chiave" http://localhost:8000/api/v1/courses
@@ -956,6 +957,42 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 ---
 
+### Autenticazione Utente (Login)
+
+#### `POST /api/v1/auth/login`
+
+Verifica le credenziali di un utente tramite Clerk. Non richiede `X-API-Key`.
+
+**Richiesta:**
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "mario.rossi@email.com", "password": "la-password"}'
+```
+
+**Credenziali corrette** — `200 OK`:
+```json
+{
+  "status": "ok",
+  "message": null
+}
+```
+
+**Credenziali errate** — `200 OK`:
+```json
+{
+  "status": "error",
+  "message": "Invalid credentials"
+}
+```
+
+| Campo | Tipo | Descrizione |
+|-------|------|-------------|
+| `status` | string | `"ok"` se autenticato, `"error"` altrimenti |
+| `message` | string \| null | Messaggio di errore (null se ok) |
+
+---
+
 ## Errori
 
 L'API utilizza codici di stato HTTP standard:
@@ -983,7 +1020,7 @@ avatar4universityAPI/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # Entry point FastAPI, include routers e autenticazione
-│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL)
+│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL, CLERK_SECRET_KEY)
 │   ├── database.py          # Engine SQLAlchemy e gestione sessioni
 │   ├── auth.py              # Dependency di autenticazione tramite API key
 │   ├── models/
@@ -999,7 +1036,8 @@ avatar4universityAPI/
 │       ├── lessons.py        # Endpoint lezioni e domande aperte
 │       ├── sections.py       # Endpoint sezioni
 │       ├── quizzes.py        # Endpoint quiz e domande quiz
-│       └── users.py          # Endpoint lista utenti
+│       ├── users.py          # Endpoint lista utenti
+│       └── auth.py           # Endpoint login (verifica password via Clerk)
 ├── add_timestamps.sql        # Migrazione timestamp per SQLite
 ├── add_timestamps_postgres.sql # Migrazione timestamp per PostgreSQL
 ├── .env.example              # Template variabili d'ambiente

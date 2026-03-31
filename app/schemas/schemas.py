@@ -213,3 +213,15 @@ class UserSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
     clerk_id: Optional[str] = None
+
+
+# --- Auth ---
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    status: str
+    message: Optional[str] = None
