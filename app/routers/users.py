@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -10,17 +10,16 @@ from app.schemas.schemas import UserSchema
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("/me", response_model=UserSchema)
-def get_user_by_clerk_id(
-    clerk_id: str = Query(...),
+@router.get("", response_model=List[UserSchema])
+def list_users(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    user = (
+    return (
         db.query(User)
-        .filter(User.clerk_id == clerk_id)
         .filter(User.deleted_at.is_(None))
-        .first()
+        .offset(skip)
+        .limit(limit)
+        .all()
     )
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user

@@ -919,34 +919,29 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 ### Utenti
 
-#### `GET /api/v1/users/me`
+#### `GET /api/v1/users`
 
-Restituisce il profilo di un utente tramite il suo `clerk_id` passato come query parameter.
+Restituisce la lista paginata degli utenti.
 
 **Richiesta:**
 ```bash
 curl -H "X-API-Key: la-tua-chiave" \
-  "http://localhost:8000/api/v1/users/me?clerk_id=user_2N..."
+  "http://localhost:8000/api/v1/users?limit=2"
 ```
 
 **Risposta** — `200 OK`:
 ```json
-{
-  "email": "mario.rossi@email.com",
-  "first_name": "Mario",
-  "last_name": "Rossi",
-  "phone": "+39123456789",
-  "created_at": "2026-01-15T10:30:00",
-  "updated_at": "2026-03-20T14:00:00",
-  "clerk_id": "user_2N..."
-}
-```
-
-**Utente non trovato** — `404 Not Found`:
-```json
-{
-  "detail": "User not found"
-}
+[
+  {
+    "email": "mario.rossi@email.com",
+    "first_name": "Mario",
+    "last_name": "Rossi",
+    "phone": "+39123456789",
+    "created_at": "2026-01-15T10:30:00",
+    "updated_at": "2026-03-20T14:00:00",
+    "clerk_id": "user_2N..."
+  }
+]
 ```
 
 | Campo | Tipo | Descrizione |
@@ -1004,7 +999,7 @@ avatar4universityAPI/
 │       ├── lessons.py        # Endpoint lezioni e domande aperte
 │       ├── sections.py       # Endpoint sezioni
 │       ├── quizzes.py        # Endpoint quiz e domande quiz
-│       └── users.py          # Endpoint utente per clerk_id
+│       └── users.py          # Endpoint lista utenti
 ├── add_timestamps.sql        # Migrazione timestamp per SQLite
 ├── add_timestamps_postgres.sql # Migrazione timestamp per PostgreSQL
 ├── .env.example              # Template variabili d'ambiente
