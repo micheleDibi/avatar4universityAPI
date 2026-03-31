@@ -7,15 +7,14 @@ app = FastAPI(
     title="Avatar4University API",
     description="Read-only API for Avatar4University course data",
     version="1.0.0",
+    dependencies=[Depends(verify_api_key)],
 )
 
-api_key_deps = [Depends(verify_api_key)]
-
-app.include_router(courses.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(modules.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(lessons.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(sections.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(quizzes.router, prefix="/api/v1", dependencies=api_key_deps)
+app.include_router(courses.router, prefix="/api/v1")
+app.include_router(modules.router, prefix="/api/v1")
+app.include_router(lessons.router, prefix="/api/v1")
+app.include_router(sections.router, prefix="/api/v1")
+app.include_router(quizzes.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 
 

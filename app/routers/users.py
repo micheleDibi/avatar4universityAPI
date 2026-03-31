@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.auth import verify_clerk_token
 from app.database import get_db
 from app.models.models import User
 from app.schemas.schemas import UserSchema
@@ -10,8 +11,8 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserSchema)
-def get_current_user(
-    clerk_id: str = Depends(verify_clerk_token),
+def get_user_by_clerk_id(
+    clerk_id: str = Query(...),
     db: Session = Depends(get_db),
 ):
     user = (

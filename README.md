@@ -26,9 +26,9 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
 
 ## Panoramica
 
-Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso ai dati dei corsi è protetto tramite API key, mentre l'endpoint utenti utilizza autenticazione Clerk via JWT.
+Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso è protetto tramite API key.
 
-**Stack tecnologico:** FastAPI, SQLAlchemy, PostgreSQL/SQLite, Pydantic, PyJWT
+**Stack tecnologico:** FastAPI, SQLAlchemy, PostgreSQL/SQLite, Pydantic
 
 ---
 
@@ -62,9 +62,9 @@ source .venv/bin/activate
 # Installa le dipendenze
 pip install -r requirements.txt
 
-# Configura le variabili d'ambiente
+# Configura la API key
 cp .env.example .env
-# Modifica il file .env e imposta API_KEY e JWT_KEY (chiave pubblica Clerk)
+# Modifica il file .env e imposta API_KEY con il valore desiderato
 ```
 
 ---
@@ -84,15 +84,13 @@ La documentazione interattiva Swagger è accessibile su `http://localhost:8000/d
 
 ## Autenticazione
 
-L'API utilizza due metodi di autenticazione distinti:
-
-### API Key (endpoint corsi, moduli, lezioni, sezioni, quiz)
-
-Richiede l'header `X-API-Key` con il valore configurato nel file `.env`.
+Tutti gli endpoint richiedono l'header `X-API-Key` con il valore configurato nel file `.env`.
 
 ```bash
 curl -H "X-API-Key: la-tua-chiave" http://localhost:8000/api/v1/courses
 ```
+
+### Risposte di errore autenticazione
 
 **Header mancante** — `422 Unprocessable Entity`:
 ```json
@@ -112,36 +110,6 @@ curl -H "X-API-Key: la-tua-chiave" http://localhost:8000/api/v1/courses
 ```json
 {
   "detail": "Invalid API key"
-}
-```
-
-### Clerk JWT (endpoint utenti)
-
-Richiede l'header `Authorization: Bearer <token>` con un JWT valido emesso da Clerk. Il token viene verificato usando la chiave pubblica RSA configurata nel file `.env` (`JWT_KEY`).
-
-```bash
-curl -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  http://localhost:8000/api/v1/users/me
-```
-
-**Token mancante o malformato** — `401 Unauthorized`:
-```json
-{
-  "detail": "Invalid authorization header"
-}
-```
-
-**Token scaduto** — `401 Unauthorized`:
-```json
-{
-  "detail": "Token expired"
-}
-```
-
-**Token non valido** — `401 Unauthorized`:
-```json
-{
-  "detail": "Invalid token"
 }
 ```
 
@@ -953,14 +921,12 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 #### `GET /api/v1/users/me`
 
-Restituisce il profilo dell'utente autenticato tramite Clerk JWT. L'utente viene identificato dal `clerk_id` contenuto nel claim `sub` del token.
-
-> **Autenticazione:** richiede header `Authorization: Bearer <clerk_jwt_token>` (non `X-API-Key`).
+Restituisce il profilo di un utente tramite il suo `clerk_id` passato come query parameter.
 
 **Richiesta:**
 ```bash
-curl -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  http://localhost:8000/api/v1/users/me
+curl -H "X-API-Key: la-tua-chiave" \
+  "http://localhost:8000/api/v1/users/me?clerk_id=user_2N..."
 ```
 
 **Risposta** — `200 OK`:
@@ -1002,7 +968,7 @@ L'API utilizza codici di stato HTTP standard:
 | Codice | Descrizione | Quando |
 |--------|-------------|--------|
 | `200` | OK | Richiesta completata con successo |
-| `401` | Unauthorized | API key non valida o token JWT non valido/scaduto |
+| `401` | Unauthorized | API key non valida |
 | `404` | Not Found | Risorsa non trovata |
 | `422` | Unprocessable Entity | Header `X-API-Key` mancante o parametri non validi |
 
@@ -1022,9 +988,9 @@ avatar4universityAPI/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # Entry point FastAPI, include routers e autenticazione
-│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL, JWT_KEY)
+│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL)
 │   ├── database.py          # Engine SQLAlchemy e gestione sessioni
-│   ├── auth.py              # Dependency di autenticazione (API key + Clerk JWT)
+│   ├── auth.py              # Dependency di autenticazione tramite API key
 │   ├── models/
 │   │   ├── __init__.py
 │   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide, OpenQuestion, Quiz, QuizQuestion, QuizOption, User)
@@ -1038,7 +1004,7 @@ avatar4universityAPI/
 │       ├── lessons.py        # Endpoint lezioni e domande aperte
 │       ├── sections.py       # Endpoint sezioni
 │       ├── quizzes.py        # Endpoint quiz e domande quiz
-│       └── users.py          # Endpoint utente autenticato (Clerk JWT)
+│       └── users.py          # Endpoint utente per clerk_id
 ├── add_timestamps.sql        # Migrazione timestamp per SQLite
 ├── add_timestamps_postgres.sql # Migrazione timestamp per PostgreSQL
 ├── .env.example              # Template variabili d'ambiente
