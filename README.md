@@ -18,6 +18,7 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
   - [Sezioni](#sezioni)
   - [Domande Aperte](#domande-aperte)
   - [Quiz](#quiz)
+  - [Utenti](#utenti)
 - [Errori](#errori)
 - [Struttura del Progetto](#struttura-del-progetto)
 
@@ -25,9 +26,9 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
 
 ## Panoramica
 
-Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso è protetto tramite API key.
+Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso ai dati dei corsi è protetto tramite API key, mentre l'endpoint utenti utilizza autenticazione Clerk via JWT.
 
-**Stack tecnologico:** FastAPI, SQLAlchemy, PostgreSQL/SQLite, Pydantic
+**Stack tecnologico:** FastAPI, SQLAlchemy, PostgreSQL/SQLite, Pydantic, PyJWT
 
 ---
 
@@ -61,9 +62,9 @@ source .venv/bin/activate
 # Installa le dipendenze
 pip install -r requirements.txt
 
-# Configura la API key
+# Configura le variabili d'ambiente
 cp .env.example .env
-# Modifica il file .env e imposta API_KEY con il valore desiderato
+# Modifica il file .env e imposta API_KEY e JWT_KEY (chiave pubblica Clerk)
 ```
 
 ---
@@ -83,13 +84,15 @@ La documentazione interattiva Swagger è accessibile su `http://localhost:8000/d
 
 ## Autenticazione
 
-Tutti gli endpoint richiedono l'header `X-API-Key` con il valore configurato nel file `.env`.
+L'API utilizza due metodi di autenticazione distinti:
+
+### API Key (endpoint corsi, moduli, lezioni, sezioni, quiz)
+
+Richiede l'header `X-API-Key` con il valore configurato nel file `.env`.
 
 ```bash
 curl -H "X-API-Key: la-tua-chiave" http://localhost:8000/api/v1/courses
 ```
-
-### Risposte di errore autenticazione
 
 **Header mancante** — `422 Unprocessable Entity`:
 ```json
@@ -109,6 +112,36 @@ curl -H "X-API-Key: la-tua-chiave" http://localhost:8000/api/v1/courses
 ```json
 {
   "detail": "Invalid API key"
+}
+```
+
+### Clerk JWT (endpoint utenti)
+
+Richiede l'header `Authorization: Bearer <token>` con un JWT valido emesso da Clerk. Il token viene verificato usando la chiave pubblica RSA configurata nel file `.env` (`JWT_KEY`).
+
+```bash
+curl -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  http://localhost:8000/api/v1/users/me
+```
+
+**Token mancante o malformato** — `401 Unauthorized`:
+```json
+{
+  "detail": "Invalid authorization header"
+}
+```
+
+**Token scaduto** — `401 Unauthorized`:
+```json
+{
+  "detail": "Token expired"
+}
+```
+
+**Token non valido** — `401 Unauthorized`:
+```json
+{
+  "detail": "Invalid token"
 }
 ```
 
@@ -916,6 +949,52 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 ---
 
+### Utenti
+
+#### `GET /api/v1/users/me`
+
+Restituisce il profilo dell'utente autenticato tramite Clerk JWT. L'utente viene identificato dal `clerk_id` contenuto nel claim `sub` del token.
+
+> **Autenticazione:** richiede header `Authorization: Bearer <clerk_jwt_token>` (non `X-API-Key`).
+
+**Richiesta:**
+```bash
+curl -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  http://localhost:8000/api/v1/users/me
+```
+
+**Risposta** — `200 OK`:
+```json
+{
+  "email": "mario.rossi@email.com",
+  "first_name": "Mario",
+  "last_name": "Rossi",
+  "phone": "+39123456789",
+  "created_at": "2026-01-15T10:30:00",
+  "updated_at": "2026-03-20T14:00:00",
+  "clerk_id": "user_2N..."
+}
+```
+
+**Utente non trovato** — `404 Not Found`:
+```json
+{
+  "detail": "User not found"
+}
+```
+
+| Campo | Tipo | Descrizione |
+|-------|------|-------------|
+| `email` | string \| null | Email dell'utente |
+| `first_name` | string \| null | Nome |
+| `last_name` | string \| null | Cognome |
+| `phone` | string \| null | Numero di telefono |
+| `created_at` | datetime | Data di creazione |
+| `updated_at` | datetime | Data di ultimo aggiornamento |
+| `clerk_id` | string \| null | Identificativo Clerk dell'utente |
+
+---
+
 ## Errori
 
 L'API utilizza codici di stato HTTP standard:
@@ -923,7 +1002,7 @@ L'API utilizza codici di stato HTTP standard:
 | Codice | Descrizione | Quando |
 |--------|-------------|--------|
 | `200` | OK | Richiesta completata con successo |
-| `401` | Unauthorized | API key non valida |
+| `401` | Unauthorized | API key non valida o token JWT non valido/scaduto |
 | `404` | Not Found | Risorsa non trovata |
 | `422` | Unprocessable Entity | Header `X-API-Key` mancante o parametri non validi |
 
@@ -943,12 +1022,12 @@ avatar4universityAPI/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # Entry point FastAPI, include routers e autenticazione
-│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL)
+│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL, JWT_KEY)
 │   ├── database.py          # Engine SQLAlchemy e gestione sessioni
-│   ├── auth.py              # Dependency di autenticazione tramite API key
+│   ├── auth.py              # Dependency di autenticazione (API key + Clerk JWT)
 │   ├── models/
 │   │   ├── __init__.py
-│   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide, OpenQuestion, Quiz, QuizQuestion, QuizOption)
+│   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide, OpenQuestion, Quiz, QuizQuestion, QuizOption, User)
 │   ├── schemas/
 │   │   ├── __init__.py
 │   │   └── schemas.py       # Schemi Pydantic per le risposte
@@ -958,7 +1037,8 @@ avatar4universityAPI/
 │       ├── modules.py        # Endpoint moduli
 │       ├── lessons.py        # Endpoint lezioni e domande aperte
 │       ├── sections.py       # Endpoint sezioni
-│       └── quizzes.py        # Endpoint quiz e domande quiz
+│       ├── quizzes.py        # Endpoint quiz e domande quiz
+│       └── users.py          # Endpoint utente autenticato (Clerk JWT)
 ├── add_timestamps.sql        # Migrazione timestamp per SQLite
 ├── add_timestamps_postgres.sql # Migrazione timestamp per PostgreSQL
 ├── .env.example              # Template variabili d'ambiente

@@ -166,3 +166,18 @@ class QuizOption(Base):
     updated_at = Column(DateTime, nullable=False)
 
     question = relationship("QuizQuestion", back_populates="options")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String)
+    first_name = Column(String)
+    last_name = Column(String)
+    phone = Column(String)
+    avatar_url = Column(String)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    deleted_at = Column(DateTime)
+    clerk_id = Column(String)
