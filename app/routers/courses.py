@@ -3,6 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.auth import verify_api_key
 from app.database import get_db
 from app.models.models import Course, Module
 from app.schemas.schemas import CourseList, CourseDetail, ModuleList
@@ -16,9 +17,10 @@ def list_courses(
     limit: int = Query(20, ge=1, le=100),
     language: Optional[str] = None,
     course_type: Optional[str] = None,
+    org_id: int = Depends(verify_api_key),
     db: Session = Depends(get_db),
 ):
-    query = db.query(Course)
+    query = db.query(Course).filter(Course.organization_id == org_id)
     if language:
         query = query.filter(Course.language == language)
     if course_type:
@@ -27,8 +29,16 @@ def list_courses(
 
 
 @router.get("/{course_id}", response_model=CourseDetail)
-def get_course(course_id: int, db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.id == course_id).first()
+def get_course(
+    course_id: int,
+    org_id: int = Depends(verify_api_key),
+    db: Session = Depends(get_db),
+):
+    course = (
+        db.query(Course)
+        .filter(Course.id == course_id, Course.organization_id == org_id)
+        .first()
+    )
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
     return course
@@ -39,9 +49,14 @@ def list_course_modules(
     course_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
+    org_id: int = Depends(verify_api_key),
     db: Session = Depends(get_db),
 ):
-    course = db.query(Course).filter(Course.id == course_id).first()
+    course = (
+        db.query(Course)
+        .filter(Course.id == course_id, Course.organization_id == org_id)
+        .first()
+    )
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
     return (

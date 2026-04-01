@@ -1,6 +1,5 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 
-from app.auth import verify_api_key
 from app.routers import courses, modules, lessons, sections, quizzes, users, auth
 
 app = FastAPI(
@@ -9,14 +8,12 @@ app = FastAPI(
     version="1.0.0",
 )
 
-api_key_deps = [Depends(verify_api_key)]
-
-app.include_router(courses.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(modules.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(lessons.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(sections.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(quizzes.router, prefix="/api/v1", dependencies=api_key_deps)
-app.include_router(users.router, prefix="/api/v1", dependencies=api_key_deps)
+app.include_router(courses.router, prefix="/api/v1")
+app.include_router(modules.router, prefix="/api/v1")
+app.include_router(lessons.router, prefix="/api/v1")
+app.include_router(sections.router, prefix="/api/v1")
+app.include_router(quizzes.router, prefix="/api/v1")
+app.include_router(users.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 
 

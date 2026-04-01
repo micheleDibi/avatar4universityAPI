@@ -186,6 +186,7 @@ class CourseBase(BaseModel):
     banner_image_url: Optional[str] = None
     slides_url: Optional[str] = None
     slides_pdf_url: Optional[str] = None
+    creator_user_id: Optional[int] = None
     course_type: str
     created_at: datetime
     updated_at: datetime

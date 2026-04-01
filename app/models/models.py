@@ -181,3 +181,15 @@ class User(Base):
     updated_at = Column(DateTime, nullable=False)
     deleted_at = Column(DateTime)
     clerk_id = Column(String)
+
+
+class UserOrganization(Base):
+    __tablename__ = "user_organizations"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    organization_id = Column(Integer)
+    role = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
