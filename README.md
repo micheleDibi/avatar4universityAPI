@@ -27,7 +27,7 @@ API REST read-only per accedere ai dati di corsi universitari generati con avata
 
 ## Panoramica
 
-Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso è protetto tramite API key.
+Questa API espone in sola lettura un database contenente corsi universitari completi, generati tramite avatar AI. Ogni corso è organizzato in una struttura gerarchica di moduli, lezioni, sezioni e slide. L'accesso è protetto tramite API key, e ogni chiave è associata a un'organizzazione: tutti i risultati sono filtrati per l'organizzazione corrispondente.
 
 **Stack tecnologico:** FastAPI, SQLAlchemy, PostgreSQL/SQLite, Pydantic
 
@@ -36,15 +36,17 @@ Questa API espone in sola lettura un database contenente corsi universitari comp
 ## Gerarchia dei Dati
 
 ```
-Course (119 record)
-  └── Module (495 record)
-        └── Lesson (3.457 record)
-              ├── Section (17.604 record)
-              │     └── Slide (10.040 record, relazione 1:1 con Section)
-              ├── OpenQuestion (1.414 record)
-              └── Quiz (241 record)
-                    └── QuizQuestion (7.094 record)
-                          └── QuizOption (28.376 record)
+Organization
+  ├── Course (via organization_id)
+  │     └── Module
+  │           └── Lesson
+  │                 ├── Section
+  │                 │     └── Slide (relazione 1:1 con Section)
+  │                 ├── OpenQuestion
+  │                 └── Quiz
+  │                       └── QuizQuestion
+  │                             └── QuizOption
+  └── User (relazione N:N via user_organizations)
 ```
 
 ---
@@ -63,9 +65,9 @@ source .venv/bin/activate
 # Installa le dipendenze
 pip install -r requirements.txt
 
-# Configura la API key
+# Configura le API keys
 cp .env.example .env
-# Modifica il file .env e imposta API_KEY con il valore desiderato
+# Modifica il file .env e imposta API_KEYS con il mapping chiave → organization_id
 ```
 
 ---
@@ -85,10 +87,17 @@ La documentazione interattiva Swagger è accessibile su `http://localhost:8000/d
 
 ## Autenticazione
 
-Tutti gli endpoint (tranne il login) richiedono l'header `X-API-Key` con il valore configurato nel file `.env`.
+Tutti gli endpoint (tranne il login) richiedono l'header `X-API-Key`. Ogni API key è associata a un `organization_id` tramite la variabile d'ambiente `API_KEYS` (JSON dict):
 
 ```bash
-curl -H "X-API-Key: la-tua-chiave" http://localhost:8000/api/v1/courses
+# .env
+API_KEYS={"chiave-org1": 1, "chiave-org2": 2}
+```
+
+Tutti i risultati vengono automaticamente filtrati per l'organizzazione associata alla chiave utilizzata. Questo include corsi, utenti e tutte le risorse figlie (moduli, lezioni, sezioni, quiz).
+
+```bash
+curl -H "X-API-Key: chiave-org1" http://localhost:8000/api/v1/courses
 ```
 
 ### Risposte di errore autenticazione
@@ -176,6 +185,7 @@ curl -H "X-API-Key: la-tua-chiave" \
     "banner_image_url": null,
     "slides_url": null,
     "slides_pdf_url": null,
+    "creator_user_id": 1,
     "course_type": "personal",
     "created_at": "2025-12-16T02:21:44.758862",
     "updated_at": "2025-12-16T02:21:44.758931",
@@ -191,6 +201,7 @@ curl -H "X-API-Key: la-tua-chiave" \
     "banner_image_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/audios/fe4b3124-91d0-4ac7-b912-89bd5a2f4d9d.png",
     "slides_url": null,
     "slides_pdf_url": null,
+    "creator_user_id": 2,
     "course_type": "personal",
     "created_at": "2025-12-16T02:22:03.709718",
     "updated_at": "2025-12-16T02:22:03.709780",
@@ -217,6 +228,7 @@ curl -H "X-API-Key: la-tua-chiave" \
     "banner_image_url": null,
     "slides_url": null,
     "slides_pdf_url": null,
+    "creator_user_id": 1,
     "course_type": "personal",
     "created_at": "2025-12-16T10:24:34.235814",
     "updated_at": "2025-12-16T10:24:34.235876",
@@ -236,6 +248,7 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `banner_image_url` | string \| null | URL dell'immagine banner |
 | `slides_url` | string \| null | URL delle slide |
 | `slides_pdf_url` | string \| null | URL del PDF delle slide |
+| `creator_user_id` | int \| null | ID dell'utente che ha creato il corso |
 | `course_type` | string | Tipologia (`personal`, `organizational`) |
 | `created_at` | datetime | Data di creazione |
 | `updated_at` | datetime | Data di ultimo aggiornamento |
@@ -265,6 +278,7 @@ curl -H "X-API-Key: la-tua-chiave" \
   "banner_image_url": "https://audios-avatar.s3.eu-north-1.amazonaws.com/audios/fe4b3124-91d0-4ac7-b912-89bd5a2f4d9d.png",
   "slides_url": null,
   "slides_pdf_url": null,
+  "creator_user_id": 2,
   "course_type": "personal",
   "created_at": "2025-12-16T02:22:03.709718",
   "updated_at": "2025-12-16T02:22:03.709780",
@@ -922,7 +936,7 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 #### `GET /api/v1/users`
 
-Restituisce la lista paginata degli utenti.
+Restituisce la lista paginata degli utenti appartenenti all'organizzazione associata all'API key.
 
 **Richiesta:**
 ```bash
@@ -1020,12 +1034,12 @@ avatar4universityAPI/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # Entry point FastAPI, include routers e autenticazione
-│   ├── config.py            # Configurazione da .env (API_KEY, DATABASE_URL, CLERK_SECRET_KEY)
+│   ├── config.py            # Configurazione da .env (API_KEYS, DATABASE_URL, CLERK_SECRET_KEY)
 │   ├── database.py          # Engine SQLAlchemy e gestione sessioni
-│   ├── auth.py              # Dependency di autenticazione tramite API key
+│   ├── auth.py              # Dependency di autenticazione tramite API key e scoping per organizzazione
 │   ├── models/
 │   │   ├── __init__.py
-│   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide, OpenQuestion, Quiz, QuizQuestion, QuizOption, User)
+│   │   └── models.py        # Modelli ORM (Course, Module, Lesson, Section, Slide, OpenQuestion, Quiz, QuizQuestion, QuizOption, User, UserOrganization)
 │   ├── schemas/
 │   │   ├── __init__.py
 │   │   └── schemas.py       # Schemi Pydantic per le risposte
