@@ -948,26 +948,26 @@ curl -H "X-API-Key: la-tua-chiave" \
 ```json
 [
   {
+    "id": 1,
     "email": "mario.rossi@email.com",
     "first_name": "Mario",
     "last_name": "Rossi",
     "phone": "+39123456789",
     "created_at": "2026-01-15T10:30:00",
-    "updated_at": "2026-03-20T14:00:00",
-    "clerk_id": "user_2N..."
+    "updated_at": "2026-03-20T14:00:00"
   }
 ]
 ```
 
 | Campo | Tipo | Descrizione |
 |-------|------|-------------|
+| `id` | int | Identificativo univoco dell'utente |
 | `email` | string \| null | Email dell'utente |
 | `first_name` | string \| null | Nome |
 | `last_name` | string \| null | Cognome |
 | `phone` | string \| null | Numero di telefono |
 | `created_at` | datetime | Data di creazione |
 | `updated_at` | datetime | Data di ultimo aggiornamento |
-| `clerk_id` | string \| null | Identificativo Clerk dell'utente |
 
 ---
 
