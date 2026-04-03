@@ -31,6 +31,45 @@ class Course(Base):
 
     modules = relationship("Module", back_populates="course", lazy="select")
 
+    @property
+    def is_completed(self) -> bool:
+        # 7. Non draft
+        if self.is_draft is not False:
+            return False
+        # 6. Avatar
+        if self.avatar_id is None:
+            return False
+        # 1. Course data
+        if not self.name or not self.prompt or not self.language:
+            return False
+        if not self.duration_minutes or self.duration_minutes < 5:
+            return False
+        # 2. Modules: almeno uno, tutti con duration_minutes e prompt
+        if not self.modules:
+            return False
+        for module in self.modules:
+            if not module.duration_minutes or not module.prompt:
+                return False
+        # 3. Lessons: almeno un modulo con lezioni
+        if not any(m.lessons for m in self.modules):
+            return False
+        for module in self.modules:
+            for lesson in module.lessons:
+                if lesson.lesson_type == "ASSESSMENT":
+                    continue
+                if not lesson.duration_minutes:
+                    return False
+                if not lesson.objectives_json or not lesson.mandatory_topics_json:
+                    return False
+                # 4. Sections: title e content non vuoti
+                for section in lesson.sections:
+                    if not section.title or not section.content:
+                        return False
+                    # 5. Slides: ogni sezione deve avere una slide
+                    if section.slide is None:
+                        return False
+        return True
+
 
 class Module(Base):
     __tablename__ = "modules"

@@ -1,14 +1,21 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.auth import verify_api_key
 from app.database import get_db
-from app.models.models import Course, Module
+from app.models.models import Course, Module, Lesson, Section
 from app.schemas.schemas import CourseList, CourseDetail, ModuleList
 
 router = APIRouter(prefix="/courses", tags=["courses"])
+
+_eager_is_completed = (
+    selectinload(Course.modules)
+    .selectinload(Module.lessons)
+    .selectinload(Lesson.sections)
+    .selectinload(Section.slide)
+)
 
 
 @router.get("", response_model=List[CourseList])
@@ -20,7 +27,11 @@ def list_courses(
     org_id: int = Depends(verify_api_key),
     db: Session = Depends(get_db),
 ):
-    query = db.query(Course).filter(Course.organization_id == org_id)
+    query = (
+        db.query(Course)
+        .options(_eager_is_completed)
+        .filter(Course.organization_id == org_id)
+    )
     if language:
         query = query.filter(Course.language == language)
     if course_type:
@@ -36,6 +47,7 @@ def get_course(
 ):
     course = (
         db.query(Course)
+        .options(_eager_is_completed)
         .filter(Course.id == course_id, Course.organization_id == org_id)
         .first()
     )

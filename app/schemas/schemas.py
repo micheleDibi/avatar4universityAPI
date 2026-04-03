@@ -192,6 +192,7 @@ class CourseBase(BaseModel):
     updated_at: datetime
     is_draft: Optional[bool] = None
     cfu: Optional[int] = Field(None, validation_alias="modules_count")
+    is_completed: bool
 
 
 class CourseList(CourseBase):

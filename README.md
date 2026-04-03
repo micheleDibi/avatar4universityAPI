@@ -190,7 +190,8 @@ curl -H "X-API-Key: la-tua-chiave" \
     "created_at": "2025-12-16T02:21:44.758862",
     "updated_at": "2025-12-16T02:21:44.758931",
     "is_draft": null,
-    "cfu": 0
+    "cfu": 0,
+    "is_completed": false
   },
   {
     "id": 2,
@@ -233,7 +234,8 @@ curl -H "X-API-Key: la-tua-chiave" \
     "created_at": "2025-12-16T10:24:34.235814",
     "updated_at": "2025-12-16T10:24:34.235876",
     "is_draft": null,
-    "cfu": 0
+    "cfu": 0,
+    "is_completed": false
   }
 ]
 ```
@@ -254,6 +256,7 @@ curl -H "X-API-Key: la-tua-chiave" \
 | `updated_at` | datetime | Data di ultimo aggiornamento |
 | `is_draft` | bool \| null | Se il corso è in bozza |
 | `cfu` | int \| null | Crediti formativi universitari (CFU) |
+| `is_completed` | bool | Se il corso soddisfa tutti i criteri di completamento |
 
 ---
 
@@ -284,6 +287,7 @@ curl -H "X-API-Key: la-tua-chiave" \
   "updated_at": "2025-12-16T02:22:03.709780",
   "is_draft": null,
   "cfu": 0,
+  "is_completed": false,
   "modules": [
     {
       "id": 6,
