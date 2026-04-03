@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # --- Slide ---
@@ -176,7 +176,7 @@ class ModuleDetail(ModuleBase):
 # --- Course ---
 
 class CourseBase(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     id: int
     name: str
@@ -191,7 +191,7 @@ class CourseBase(BaseModel):
     created_at: datetime
     updated_at: datetime
     is_draft: Optional[bool] = None
-    modules_count: Optional[int] = None
+    cfu: Optional[int] = Field(None, validation_alias="modules_count")
 
 
 class CourseList(CourseBase):
