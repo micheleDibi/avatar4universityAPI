@@ -64,6 +64,10 @@ source .venv/bin/activate
 
 # Installa le dipendenze
 pip install -r requirements.txt
+# Nota: WeasyPrint richiede librerie di sistema. Su macOS:
+#   brew install pango cairo gdk-pixbuf libffi
+# Su Debian/Ubuntu:
+#   apt-get install libpango-1.0-0 libpangoft2-1.0-0
 
 # Configura le API keys
 cp .env.example .env
@@ -648,6 +652,31 @@ curl -H "X-API-Key: la-tua-chiave" \
 
 ---
 
+#### `GET /api/v1/lessons/{id}/pdf`
+
+Genera e restituisce un file PDF della lezione, contenente tutte le sezioni in ordine. Il PDF include il branding eCampus + SSML, il numero della lezione e ogni sezione su una pagina dedicata. Il contenuto delle sezioni viene interpretato come Markdown.
+
+**Richiesta:**
+```bash
+curl -H "X-API-Key: la-tua-chiave" \
+  http://localhost:8000/api/v1/lessons/7/pdf \
+  -o lezione.pdf
+```
+
+**Risposta** — `200 OK`:
+- `Content-Type: application/pdf`
+- `Content-Disposition: attachment; filename="<corso>_modulo-<n>_<titolo-lezione>.pdf"` (es. `diritto-costituzionale_modulo-1_introduzione-all-ordinamento-costituzionale.pdf`)
+- Body: bytes del PDF
+
+**Lezione non trovata** — `404 Not Found`:
+```json
+{
+  "detail": "Lesson not found"
+}
+```
+
+---
+
 ### Sezioni
 
 #### `GET /api/v1/sections/{id}`
@@ -1047,11 +1076,18 @@ avatar4universityAPI/
 │   ├── schemas/
 │   │   ├── __init__.py
 │   │   └── schemas.py       # Schemi Pydantic per le risposte
+│   ├── services/
+│   │   ├── __init__.py
+│   │   └── pdf_generator.py # Generazione PDF lezione (WeasyPrint + Jinja2 + Markdown)
+│   ├── templates/
+│   │   ├── lesson.html      # Template Jinja2 per il PDF della lezione
+│   │   ├── lesson.css       # Stili WeasyPrint del PDF
+│   │   └── assets/          # Loghi e sfondo del PDF
 │   └── routers/
 │       ├── __init__.py
 │       ├── courses.py        # Endpoint corsi
 │       ├── modules.py        # Endpoint moduli
-│       ├── lessons.py        # Endpoint lezioni e domande aperte
+│       ├── lessons.py        # Endpoint lezioni, domande aperte e PDF
 │       ├── sections.py       # Endpoint sezioni
 │       ├── quizzes.py        # Endpoint quiz e domande quiz
 │       ├── users.py          # Endpoint lista utenti

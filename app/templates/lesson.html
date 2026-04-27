@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ lesson.title }}</title>
+</head>
+<body>
+    <div class="page-header">
+        <img class="logo-left" src="assets/eCampus_logo.png" alt="eCampus">
+        <img class="logo-right" src="assets/ssml_città_di_lamezia.png" alt="SSML Città di Lamezia Terme">
+    </div>
+
+    {% if sections_html %}
+        {% set first = sections_html[0] %}
+        <section class="cover-section">
+            <div class="lesson-label">Lezione {{ lesson_number }}</div>
+            <h1 class="lesson-title">{{ lesson.title }}</h1>
+            {% if first.title %}<h2 class="section-title">{{ first.title }}</h2>{% endif %}
+            <div class="section-body">{{ first.html_body|safe }}</div>
+        </section>
+
+        {% for section in sections_html[1:] %}
+        <section class="lesson-section">
+            {% if section.title %}<h2 class="section-title">{{ section.title }}</h2>{% endif %}
+            <div class="section-body">{{ section.html_body|safe }}</div>
+        </section>
+        {% endfor %}
+    {% else %}
+        <section class="cover-section">
+            <div class="lesson-label">Lezione {{ lesson_number }}</div>
+            <h1 class="lesson-title">{{ lesson.title }}</h1>
+        </section>
+    {% endif %}
+</body>
+</html>

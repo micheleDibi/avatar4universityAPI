@@ -4,3 +4,6 @@ sqlalchemy
 psycopg[binary]
 python-dotenv
 requests
+weasyprint
+jinja2
+markdown
