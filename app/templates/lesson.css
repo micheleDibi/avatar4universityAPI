@@ -1,6 +1,6 @@
 @page {
     size: A4;
-    margin: 3.2cm 2cm 2.2cm 2cm;
+    margin: 4cm 2cm 2.2cm 2cm;
 
     @top-left {
         content: element(pageHeader);
@@ -18,7 +18,7 @@
 
 .page-background {
     position: fixed;
-    top: -3.2cm;
+    top: -4cm;
     bottom: -2.2cm;
     left: -2cm;
     right: -2cm;
@@ -34,16 +34,16 @@
     width: 100%;
     border-bottom: 1px solid rgba(26, 45, 74, 0.35);
     padding-bottom: 6pt;
-    margin-top: 4pt;
+    margin-top: 0.9cm;
 }
 
 .page-header .logo-left {
-    height: 28pt;
+    height: 38pt;
     float: left;
 }
 
 .page-header .logo-right {
-    height: 28pt;
+    height: 38pt;
     float: right;
 }
 
