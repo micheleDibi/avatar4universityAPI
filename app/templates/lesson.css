@@ -1,9 +1,6 @@
 @page {
     size: A4;
     margin: 3.2cm 2cm 2.2cm 2cm;
-    background-image: url("assets/sfondo_ecampus.jpg");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
 
     @top-left {
         content: element(pageHeader);
@@ -17,6 +14,19 @@
         font-size: 10pt;
         color: #1a2d4a;
     }
+}
+
+.page-background {
+    position: fixed;
+    top: -3.2cm;
+    bottom: -2.2cm;
+    left: -2cm;
+    right: -2cm;
+    background-image: url("assets/sfondo_ecampus.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: -100;
 }
 
 .page-header {

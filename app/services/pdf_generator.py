@@ -35,7 +35,7 @@ def build_lesson_pdf(lesson: Lesson, sections: List[Section]) -> bytes:
     template = _env.get_template("lesson.html")
     html_str = template.render(
         lesson=lesson,
-        lesson_number=lesson.order if lesson.order is not None else 1,
+        lesson_number=(lesson.order or 0) + 1,
         sections_html=sections_html,
     )
 
